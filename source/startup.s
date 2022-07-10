@@ -5,8 +5,8 @@
 
 .global	interrupt_vectors
 .global	main
-
-/* linker defined values =====================================================*/
+.global systick_handler
+/* linker defined values ==================================================== */
 
 .word _eram
 .word _etext
@@ -15,7 +15,7 @@
 .word _sbss
 .word _ebss
 
-/* reset_handler =============================================================*/
+/* reset_handler ============================================================ */
 
 .section .text.reset_handler
 .weak reset_handler
@@ -63,7 +63,7 @@ halt:
 
 .size reset_handler, .-reset_handler
 
-/* interrupt vectors =========================================================*/
+/* interrupt vectors ======================================================== */
 
 .section .interrupt_vectors,"a",%progbits
 .type interrupt_vectors, %object
@@ -84,7 +84,7 @@ interrupt_vectors:
 	.word 0                          /* 0x030 Debug Monitor                   */
 	.word 0                          /* 0x034 Reserved                        */
 	.word 0                          /* 0x038 PendSV                          */
-	.word 0                          /* 0x03C System tick timer               */
+	.word systick_handler            /* 0x03C System tick timer               */
 	.word 0                          /* 0x040 Window watchdog                 */
 	.word 0                          /* 0x044 PVD through EXTI Line detection */
 	.word 0                          /* 0x048 Tamper                          */
@@ -147,3 +147,8 @@ interrupt_vectors:
 	.word 0                          /* 0x12C DMA2_Ch4                        */
 
 .size interrupt_vectors, .-interrupt_vectors
+
+/* weak aliases for interrupt vectors ======================================= */
+
+#.weak systick_handler
+#  .thumb_set systick_handler, reset_handler
