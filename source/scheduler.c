@@ -7,8 +7,6 @@
 #define MSP_RETURN (0xFFFFFFF9) 
 #define PSP_RETURN (0xFFFFFFFD)
 
-static uint8_t mem[1000];
-
 static scheduler_process_t processes[PROCESSES_LEN];
 static uint32_t current = 0;
 static uint32_t *stack;
@@ -16,8 +14,8 @@ static uint32_t *stack;
 static void context_switcher(); 
 static inline void push_context();
 static inline void pop_context();
-static void get_stack_pointer();
-static void set_stack_pointer();
+static inline void get_stack_pointer();
+static inline void set_stack_pointer();
 
 void scheduler_init()
 {
@@ -29,8 +27,8 @@ void scheduler_init()
         processes[i].state = NONE;
     }
 
-    //uint32_t tmp = &mem[100];
-    //set_stack_pointer(&tmp);
+    processes[0].state = READY;
+
     enable_interrupts();
 }
 
@@ -77,29 +75,27 @@ void systick_handler()
     context_switcher();
     set_stack_pointer();
 
-    // if(current != 0) {
-    //     asm volatile("mvn lr, #0xFFFFFFFD");
-    // }
-
+     asm volatile("mvn lr, #0xFFFFFFF9");
+     
     enable_interrupts();
     pop_context();
+    
 }
 
 void context_switcher()
 {
-    processes[current].stack = stack;
+    //processes[current].stack = stack;
 
     while(1) {
-        current++;
-        if (current == PROCESSES_LEN) {
-          current = 0;
-          //*stack = MSP_RETURN; //Return to kernel using main stack
-          break;
-        } else if (processes[current].state == READY) {
-          stack = processes[current].stack;
-          //*stack = PSP_RETURN;
-          break;
-        }
+        current+=1;
+        //if(++current >= PROCESSES_LEN) current = 0;
+        break;
+        
+        // if (processes[current].state == READY || 1) {
+        //   //stack = processes[current].stack;
+        //   //*stack = PSP_RETURN;
+        //   break;
+        // }
     }
 }
 
@@ -108,9 +104,9 @@ void push_context()
   uint32_t temp;
 
   asm volatile(
-    "mrs %0, psp                  \n\t"
+    "mrs %0, msp                  \n\t"
     "stmdb %0!, {r4-r11}          \n\t"
-    "msr psp, %0                  \n\t"
+    "msr msp, %0                  \n\t"
     : "=r" (temp));
 
 }
@@ -120,22 +116,22 @@ void pop_context()
   uint32_t temp;
 
   asm volatile(
-    "mrs %0, psp                  \n\t"
+    "mrs %0, msp                  \n\t"
     "ldmfd %0!, {r4-r11}          \n\t"
-    "msr psp, %0                  \n\t"
+    "msr msp, %0                  \n\t"
     : "=r" (temp));
 }
 
 void get_stack_pointer()
 {
   asm volatile(
-    "mrs %0, psp                  \n\t"
+    "mrs %0, msp                  \n\t"
     : "=r" (stack));
 }
 
 void set_stack_pointer()
 {
   asm volatile(
-    "msr psp, %0                  \n\t"
+    "msr msp, %0                  \n\t"
     : "=r" (stack));
 }

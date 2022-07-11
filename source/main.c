@@ -16,8 +16,9 @@ int main() {
 
     gpio_setup(GPIOC, GPIO_OUT, 13);
     gpio_write(GPIOC, 13, 0);
-
-    scheduler_new_process(test, 0, stack, 100);
+    for(int i = 0; i < 5000; i++);
+    gpio_write(GPIOC, 13, 1);
+    //scheduler_new_process(test, 0, stack, 100);
    
     while(1);
 }
