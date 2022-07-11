@@ -85,7 +85,7 @@ interrupt_vectors:
 	.word 0                          /* 0x02C System service call             */
 	.word 0                          /* 0x030 Debug Monitor                   */
 	.word 0                          /* 0x034 Reserved                        */
-	.word 0                          /* 0x038 PendSV                          */
+	.word pendsv_handler             /* 0x038 PendSV                          */
 	.word systick_handler            /* 0x03C System tick timer               */
 	.word 0                          /* 0x040 Window watchdog                 */
 	.word 0                          /* 0x044 PVD through EXTI Line detection */
@@ -154,3 +154,6 @@ interrupt_vectors:
 
 .weak systick_handler
   .thumb_set systick_handler, reset_handler
+
+.weak pendsv_handler
+  .thumb_set pendsv_handler, reset_handler
