@@ -5,7 +5,7 @@
 
 .global	interrupt_vectors
 .global	main
-.global systick_handler
+
 /* linker defined values ==================================================== */
 
 .word _eram
@@ -53,9 +53,11 @@ zero_data_loop:
     b zero_data_loop
 zero_data_end:
 
+//setup libc
+bl __libc_init_array
+
 //execute main function
 bl	main
-bx	lr
 
 //halt
 halt:
@@ -150,5 +152,5 @@ interrupt_vectors:
 
 /* weak aliases for interrupt vectors ======================================= */
 
-#.weak systick_handler
-#  .thumb_set systick_handler, reset_handler
+.weak systick_handler
+  .thumb_set systick_handler, reset_handler
