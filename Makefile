@@ -61,11 +61,11 @@ C_INCLUDES = \
 -Iinclude
 
 # compile gcc flags
-ASFLAGS = $(MCU) $(AS_DEFS) $(AS_INCLUDES) $(OPT) -Wall -fdata-sections \
--ffunction-sections
+ASFLAGS = $(MCU) $(AS_DEFS) $(AS_INCLUDES) $(OPT) -nostartfiles -nostdlib \
+-nodefaultlibs -ffreestanding -lnosys -nostdinc
 
-CFLAGS = $(MCU) $(C_DEFS) $(C_INCLUDES) $(OPT) -Wall -fdata-sections \
--ffunction-sections
+CFLAGS = $(MCU) $(C_DEFS) $(C_INCLUDES) $(OPT) -nostartfiles -nostdlib \
+-nodefaultlibs -ffreestanding -lnosys -nostdinc
 
 ifeq ($(DEBUG), 1)
 CFLAGS += -g -gdwarf-2
