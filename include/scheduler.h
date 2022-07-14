@@ -10,6 +10,12 @@
 typedef void (*process_handler_t)(void *);
 
 typedef enum {
+	SCHEDULER_DEFAULT = 1,
+	SCHEDULER_INITED,
+	SCHEDULER_STARTED,
+} scheduler_state_t;
+
+typedef enum {
 	NONE,
 	READY,
 	BLOCKED,
@@ -48,6 +54,8 @@ uint8_t scheduler_create(
 	uint32_t *stack,
 	uint32_t stack_size);
 
-uint8_t scheduler_start(uint32_t systick_ticks);
+uint8_t scheduler_start();
+
+uint64_t scheduler_time();
 
 #endif /* SCHEDULER_H */

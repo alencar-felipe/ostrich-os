@@ -57,17 +57,14 @@ pendsv_handler:
 	subs	r0, #16
 
 	/* Save current task's SP: */
-	ldr	r2, =os_curr_task
+	ldr	r2, =scheduler_current_sp
 	ldr	r1, [r2]
 	str	r0, [r1]
 
 	/* Load next task's SP: */
-	ldr	r3, =os_next_task
+	ldr	r3, =scheduler_next_sp
 	ldr	r1, [r3]
 	ldr	r0, [r1]
-
-	/* Updtate current task */
-	str r3, [r2]
 
 	/* Load registers R4-R11 (32 bytes) from the new PSP and make the PSP
 	   point to the end of the exception stack frame. The NVIC hardware
