@@ -45,7 +45,7 @@ pendsv_handler:
 	   - The STMIA inscruction can only save low registers (R0-R7), it is
 	     therefore necesary to copy registers R8-R11 into R4-R7 and call
 	     STMIA twice. */
-	mrs	r0, psp
+	mrs	r0, msp
 	subs	r0, #16
 	stmia	r0!,{r4-r7}
 	mov	r4, r8
@@ -62,9 +62,12 @@ pendsv_handler:
 	str	r0, [r1]
 
 	/* Load next task's SP: */
-	ldr	r2, =os_next_task
-	ldr	r1, [r2]
+	ldr	r3, =os_next_task
+	ldr	r1, [r3]
 	ldr	r0, [r1]
+
+	/* Updtate current task */
+	str r3, [r2]
 
 	/* Load registers R4-R11 (32 bytes) from the new PSP and make the PSP
 	   point to the end of the exception stack frame. The NVIC hardware
@@ -75,10 +78,10 @@ pendsv_handler:
 	mov	r10, r6
 	mov	r11, r7
 	ldmia	r0!,{r4-r7}
-	msr	psp, r0
+	msr	msp, r0
 
 	/* EXC_RETURN - Thread mode with PSP: */
-	ldr r0, =0xFFFFFFFD
+	ldr r0, =0xFFFFFFF9
 
 	/* Enable interrupts: */
 	cpsie	i

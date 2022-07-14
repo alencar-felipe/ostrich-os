@@ -29,8 +29,8 @@ static struct task_table {
 	uint32_t size;
 } task_table;
 
-volatile struct os_task *os_curr_task;
-volatile struct os_task *os_next_task;
+volatile uint32_t *os_curr_task;
+volatile uint32_t *os_next_task;
 
 static void task_finished(void)
 {
@@ -109,30 +109,32 @@ uint8_t scheduler_start(uint32_t systick_ticks)
 	if (ret_val != 0) return -1;
 
 	// start the first task
-	os_curr_task = &task_table.tasks[task_table.current_task];
+	os_next_task = &task_table.tasks[task_table.current_task].sp;
+	os_curr_task = &task_table.tasks[task_table.current_task].sp;
 	state = STATE_STARTED;
 
-	__set_PSP(os_curr_task->sp+64); // set PSP to the top of task's stack
-	__set_CONTROL(0x03); // switch to Unprivilleged Thread Mode with PSP
-	__ISB(); // execute ISB after changing CONTORL (recommended)
+	//__set_MSP(os_curr_task->sp+64); // set PSP to the top of task's stack
+	//__set_CONTROL(0x03); // switch to Unprivilleged Thread Mode with PSP
+	//__ISB(); // execute ISB after changing CONTORL (recommended)
 
-	os_curr_task->handler(os_curr_task->params);
+	while(1);
+	//os_curr_task->handler(os_curr_task->params);
 
 	return 0;
 }
 
 void systick_handler(void)
 {
-	os_curr_task = &task_table.tasks[task_table.current_task];
-	os_curr_task->status = OS_TASK_STATUS_IDLE;
+	os_curr_task = os_next_task; //&task_table.tasks[task_table.current_task].sp;
+	//os_curr_task->status = OS_TASK_STATUS_IDLE;
 
 	// select next task
 	task_table.current_task++;
 	if (task_table.current_task >= task_table.size)
 		task_table.current_task = 0;
 
-	os_next_task = &task_table.tasks[task_table.current_task];
-	os_next_task->status = OS_TASK_STATUS_ACTIVE;
+	os_next_task = &task_table.tasks[task_table.current_task].sp;
+	//os_next_task->status = OS_TASK_STATUS_ACTIVE;
 
 	// trigger PendSV which performs the actual context switch
 	SCB->ICSR |= SCB_ICSR_PENDSVSET_Msk;

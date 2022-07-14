@@ -30,6 +30,7 @@ int main(void)
 
 	scheduler_init();
 
+	//scheduler_create(&task_handler, (void*)p1, stack1, sizeof(stack1));
 	scheduler_create(&task_handler, (void*)p1, stack1, sizeof(stack1));
 	scheduler_create(&task_handler, (void*)p2, stack2, sizeof(stack2));
 	scheduler_create(&task_handler, (void*)p3, stack3, sizeof(stack3));

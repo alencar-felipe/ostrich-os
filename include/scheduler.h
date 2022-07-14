@@ -9,6 +9,18 @@
 
 typedef void (*process_handler_t)(void *);
 
+typedef enum {
+	NONE,
+	READY,
+	BLOCKED,
+	RUNNING,
+} process_state_t;
+
+typedef struct {
+	uint32_t sp;
+	process_state_t state;	
+} process_t;
+
 typedef struct __attribute__((__packed__)) {
     uint32_t r8;  	// -16
 	uint32_t r9;	// -15
